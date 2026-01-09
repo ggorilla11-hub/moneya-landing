@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>나의 부자지수는? | AI머니야 무료 재무진단</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="30초만에 알아보는 나의 부자지수! 나이, 월급, 자산, 부채만 입력하면 나의 금융집짓기® 단계를 무료로 진단받을 수 있습니다.">
+<meta name="keywords" content="부자지수, 재무진단, 금융집짓기, AI머니야, 가계부, 재테크, CFP">
+
+<!-- Open Graph for 카카오톡/SNS 공유 -->
+<meta property="og:title" content="나의 부자지수는? 30초 무료 진단">
+<meta property="og:description" content="나이, 월급, 자산, 부채만 입력하면 나의 금융집짓기® 단계가 텐트인지 궁전인지 알 수 있어요!">
+<meta property="og:image" content="https://moneya-frontend.vercel.app/assets/house3-CiiNxUBf.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://moneya.app/diagnosis">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#7C3AED;--primary-light:#A78BFA;--primary-dark:#5B21B6;--primary-bg:#F5F3FF;--teal:#4ECDC4;--teal-dark:#44A08D;--gold:#F59E0B;--gold-dark:#D97706;--success:#10B981;--danger:#EF4444;--bg:#FFF;--bg-secondary:#F8FAFC;--bg-tertiary:#F1F5F9;--text:#0F172A;--text-secondary:#64748B;--text-muted:#94A3B8;--border:#E2E8F0;--shadow:0 4px 6px -1px rgba(0,0,0,0.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1);--shadow-xl:0 20px 25px -5px rgba(0,0,0,0.1);--radius:16px;--radius-sm:12px;--radius-xs:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-secondary);min-height:100vh;color:var(--text)}
+.container{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative}
+
+/* 화면 전환 */
+.screen{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .4s}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* 헤더 */
+.header{display:flex;align-items:center;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-back{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--bg-tertiary);cursor:pointer;font-size:20px;border:none;transition:all .2s}
+.header-back:hover{background:var(--border)}
+.header-title{flex:1;text-align:center;font-size:18px;font-weight:700;margin-right:40px}
+
+/* 진행률 */
+.progress-section{padding:16px 20px;background:var(--bg)}
+.progress-info{display:flex;justify-content:space-between;margin-bottom:10px}
+.progress-label{font-size:13px;color:var(--text-secondary);font-weight:600}
+.progress-percent{font-size:13px;color:var(--primary);font-weight:700}
+.progress-bar{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:4px;transition:width .5s}
+
+/* 콘텐츠 영역 */
+.content{flex:1;padding:20px;overflow-y:auto}
+.content::-webkit-scrollbar{width:0}
+
+/* 버튼 */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 28px;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;box-shadow:0 4px 14px rgba(124,58,237,0.4)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,58,237,0.5)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-secondary{background:var(--bg-tertiary);color:var(--text-secondary)}
+.btn-kakao{background:#FEE500;color:#3C1E1E}
+.btn-kakao:hover{background:#FAE100}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text-secondary)}
+
+/* 하단 고정 */
+.bottom-fixed{padding:16px 20px;background:var(--bg);border-top:1px solid var(--border);position:sticky;bottom:0}
+
+/* 카드 */
+.card{background:white;border-radius:var(--radius);padding:24px;margin-bottom:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.card-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.card-icon.purple{background:linear-gradient(135deg,#EDE9FE,#DDD6FE)}
+.card-icon.yellow{background:linear-gradient(135deg,#FEF3C7,#FDE68A)}
+.card-icon.green{background:linear-gradient(135deg,#D1FAE5,#A7F3D0)}
+.card-icon.red{background:linear-gradient(135deg,#FEE2E2,#FECACA)}
+.card-icon.blue{background:linear-gradient(135deg,#DBEAFE,#BFDBFE)}
+.card-icon.teal{background:linear-gradient(135deg,#CCFBF1,#99F6E4)}
+.card-title{font-size:17px;font-weight:700;color:var(--text)}
+.card-desc{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+/* 폼 요소 */
+.form-group{margin-bottom:20px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.form-input{width:100%;padding:16px 18px;border:2px solid var(--border);border-radius:var(--radius-xs);font-size:16px;font-family:inherit;transition:all .2s;background:var(--bg)}
+.form-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(124,58,237,0.1)}
+.form-input::placeholder{color:var(--text-muted)}
+.form-input.error{border-color:var(--danger)}
+.form-error{font-size:12px;color:var(--danger);margin-top:6px}
+.input-with-suffix{position:relative}
+.input-with-suffix .form-input{padding-right:60px}
+.input-suffix{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text-muted);font-weight:600}
+
+/* 선택 버튼 그룹 */
+.select-group{display:flex;gap:10px;flex-wrap:wrap}
+.select-btn{flex:1;min-width:calc(33.333% - 8px);padding:14px 10px;border:2px solid var(--border);border-radius:var(--radius-xs);background:var(--bg);font-size:15px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
+.select-btn:hover{border-color:var(--primary-light);background:var(--primary-bg)}
+.select-btn.active{border-color:var(--primary);background:var(--primary-bg);color:var(--primary)}
+
+/* ========== 1. 랜딩페이지 ========== */
+.landing-hero{background:linear-gradient(135deg,var(--primary) 0%,#4C1D95 100%);padding:40px 24px 70px;text-align:center;color:white;position:relative;overflow:hidden}
+.landing-hero::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%)}
+.landing-hero::after{content:'';position:absolute;bottom:-50px;left:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(78,205,196,0.2) 0%,transparent 70%)}
+.landing-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);padding:10px 20px;border-radius:999px;font-size:14px;font-weight:600;margin-bottom:24px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2)}
+.landing-title{font-size:32px;font-weight:900;line-height:1.3;margin-bottom:16px;text-shadow:0 2px 10px rgba(0,0,0,0.2)}
+.landing-title .highlight{color:#FDE68A}
+.landing-subtitle{font-size:15px;opacity:0.9;line-height:1.6}
+.landing-stats{display:flex;justify-content:center;gap:40px;margin-top:28px}
+.stat-item{text-align:center}
+.stat-number{font-size:28px;font-weight:800}
+.stat-label{font-size:12px;opacity:0.8;margin-top:4px}
+
+.diagnosis-card{background:white;margin:-50px 20px 20px;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-xl);position:relative;z-index:10;border:1px solid rgba(124,58,237,0.1)}
+.diagnosis-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.diagnosis-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 6px 16px rgba(245,158,11,0.3)}
+.diagnosis-info h3{font-size:20px;font-weight:800;color:var(--text)}
+.diagnosis-info p{font-size:14px;color:var(--text-secondary);margin-top:6px}
+.diagnosis-features{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.feature-tag{display:flex;align-items:center;gap:8px;background:var(--bg-secondary);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:500;color:var(--text-secondary)}
+
+.trust-section{padding:0 20px 20px}
+.trust-card{background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);border:1px solid #FDE68A;border-radius:var(--radius-sm);padding:20px;display:flex;align-items:center;gap:16px}
+.trust-avatar{width:60px;height:60px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:white;box-shadow:0 4px 12px rgba(124,58,237,0.3)}
+.trust-info{flex:1}
+.trust-info h4{font-size:15px;font-weight:700;color:var(--text)}
+.trust-info p{font-size:12px;color:var(--text-secondary);margin-top:4px;line-height:1.4}
+.trust-badge{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700}
+
+.copyright{text-align:center;padding:20px;font-size:11px;color:var(--text-muted)}
+
+/* ========== 2. 입력 화면 ========== */
+/* 위의 공통 스타일 사용 */
+
+/* ========== 3. 결과 화면 ========== */
+.result-screen{background:linear-gradient(180deg,var(--primary) 0%,var(--primary-dark) 100%)}
+.result-hero{padding:32px 24px;text-align:center;color:white}
+.result-confetti{font-size:40px;margin-bottom:12px;animation:bounce 1s ease-in-out infinite}
+.result-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.2);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;margin-bottom:16px}
+.result-title{font-size:24px;font-weight:800;margin-bottom:8px}
+.result-name{font-size:15px;opacity:0.9}
+
+.house-display{background:white;margin:0 20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-xl)}
+.house-image-container{position:relative;width:100%;height:220px;overflow:hidden}
+.house-image{width:100%;height:100%;object-fit:cover}
+.house-level-badge{position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.7);color:white;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;backdrop-filter:blur(10px)}
+.house-info{padding:24px;text-align:center}
+.house-name{font-size:28px;font-weight:900;color:var(--text);margin-bottom:12px}
+.house-score{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:12px 24px;border-radius:999px;font-size:18px;font-weight:700}
+.house-desc{margin-top:20px;padding:18px;background:var(--bg-secondary);border-radius:var(--radius-xs);font-size:15px;color:var(--text-secondary);line-height:1.7;text-align:left}
+
+.share-section{padding:20px 24px;display:flex;gap:12px}
+.share-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border-radius:var(--radius-xs);font-size:15px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.share-btn.kakao{background:#FEE500;color:#3C1E1E}
+.share-btn.copy{background:var(--bg-tertiary);color:var(--text-secondary)}
+
+.cta-section{background:white;margin:20px;border-radius:var(--radius);padding:28px 24px;border:2px solid var(--primary);position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--teal),var(--gold))}
+.cta-header{text-align:center;margin-bottom:24px}
+.cta-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--primary-bg),#EDE9FE);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px}
+.cta-header h3{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px}
+.cta-header p{font-size:14px;color:var(--text-secondary);line-height:1.5}
+.cta-benefits{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.cta-benefit{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-secondary);border-radius:var(--radius-xs);font-size:14px;color:var(--text)}
+.cta-benefit .check{width:24px;height:24px;background:var(--success);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+
+/* ========== 4. CTA 입력 폼 ========== */
+.cta-form-screen{background:linear-gradient(180deg,#F0F9FF 0%,#E0F2FE 100%)}
+.cta-form-card{background:white;margin:20px;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-lg)}
+.cta-form-header{text-align:center;margin-bottom:28px}
+.cta-form-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(124,58,237,0.3)}
+.cta-form-header h3{font-size:22px;font-weight:800;color:var(--text)}
+.cta-form-header p{font-size:14px;color:var(--text-secondary);margin-top:8px;line-height:1.5}
+.form-divider{height:1px;background:var(--border);margin:24px 0}
+.privacy-notice{display:flex;align-items:flex-start;gap:12px;padding:16px;background:var(--bg-secondary);border-radius:var(--radius-xs);margin-top:20px}
+.privacy-notice .icon{font-size:20px;flex-shrink:0}
+.privacy-notice p{font-size:12px;color:var(--text-muted);line-height:1.5}
+
+/* ========== 5. 완료 화면 ========== */
+.complete-screen{background:linear-gradient(135deg,var(--success) 0%,#059669 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;color:white}
+.complete-icon{font-size:80px;margin-bottom:24px;animation:bounce 1s ease-in-out infinite}
+.complete-title{font-size:28px;font-weight:900;margin-bottom:12px}
+.complete-desc{font-size:16px;opacity:0.9;line-height:1.6;margin-bottom:32px}
+.complete-info{background:rgba(255,255,255,0.15);padding:20px 24px;border-radius:var(--radius-sm);margin-bottom:32px;backdrop-filter:blur(10px)}
+.complete-info p{font-size:14px;line-height:1.6}
+
+/* 로딩 */
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:20px}
+.loading-overlay.active{display:flex}
+.loading-spinner{width:50px;height:50px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:16px;color:var(--text-secondary);font-weight:600}
+
+/* 토스트 메시지 */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--text);color:white;padding:14px 24px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;z-index:1000}
+.toast.show{opacity:1}
+
+/* 반응형 */
+@media(min-width:481px){.container{box-shadow:var(--shadow-xl)}}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">분석 중...</div>
+  </div>
+  
+  <!-- 토스트 메시지 -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ========== 1. 랜딩페이지 ========== -->
+  <div class="screen active" id="s-landing">
+    <div class="landing-hero">
+      <div class="landing-badge"><span>🎯</span> 30초 무료 진단</div>
+      <h1 class="landing-title">나는 <span class="highlight">부자</span>일까?<br/><span class="highlight">가난</span>할까?</h1>
+      <p class="landing-subtitle">30초만에 알아보는 나의 재무등급<br/>당신의 금융집짓기®는 텐트? 궁전?</p>
+      <div class="landing-stats">
+        <div class="stat-item"><div class="stat-number" id="stat-count">32,847</div><div class="stat-label">진단 완료</div></div>
+        <div class="stat-item"><div class="stat-number">4.9★</div><div class="stat-label">만족도</div></div>
+      </div>
+    </div>
+    
+    <div class="diagnosis-card">
+      <div class="diagnosis-header">
+        <div class="diagnosis-icon">🏠</div>
+        <div class="diagnosis-info">
+          <h3>부자지수 무료 진단</h3>
+          <p>토마스 스탠리 교수의 부자 공식</p>
+        </div>
+      </div>
+      <div class="diagnosis-features">
+        <div class="feature-tag"><span>⏱️</span> 30초 완료</div>
+        <div class="feature-tag"><span>🔒</span> 정보 보호</div>
+        <div class="feature-tag"><span>📊</span> AI 분석</div>
+        <div class="feature-tag"><span>🎁</span> 100% 무료</div>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('s-input')">무료 진단 시작하기 <span>→</span></button>
+    </div>
+    
+    <div class="trust-section">
+      <div class="trust-card">
+        <div class="trust-avatar">👨‍💼</div>
+        <div class="trust-info">
+          <h4>오상열 대표 CFP</h4>
+          <p>금융집짓기® 창시자<br/>20년+ 재무설계 경력</p>
+        </div>
+        <div class="trust-badge">검증됨</div>
+      </div>
+    </div>
+    
+    <div class="copyright">© 2017 오원트금융연구소. All rights reserved</div>
+  </div>
+
+  <!-- ========== 2. 입력 화면 ========== -->
+  <div class="screen" id="s-input">
+    <div class="header">
+      <button class="header-back" onclick="goTo('s-landing')">←</button>
+      <div class="header-title">부자지수 진단</div>
+    </div>
+    
+    <div class="progress-section">
+      <div class="progress-info">
+        <span class="progress-label">기본 정보 입력</span>
+        <span class="progress-percent">50%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+    </div>
+    
+    <div class="content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon purple">👤</div>
+          <div><div class="card-title">기본 정보</div><div class="card-desc">닉네임과 나이를 입력해주세요</div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">닉네임 *</label>
+          <input type="text" class="form-input" placeholder="예) 재테크왕" id="input-nickname" maxlength="20">
+          <div class="form-error" id="error-nickname"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">나이 *</label>
+          <div class="input-with-suffix">
+            <input type="number" class="form-input" placeholder="35" id="input-age" min="19" max="100">
+            <span class="input-suffix">세</span>
+          </div>
+          <div class="form-error" id="error-age"></div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon yellow">💰</div>
+          <div><div class="card-title">월 수입</div><div class="card-desc">세후 실수령액 기준</div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">월급 *</label>
+          <div class="input-with-suffix">
+            <input type="number" class="form-input" placeholder="400" id="input-income" min="0">
+            <span class="input-suffix">만원</span>
+          </div>
+          <div class="form-error" id="error-income"></div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">📈</div>
+          <div><div class="card-title">총 자산</div><div class="card-desc">부동산 + 금융자산 합계</div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">자산 *</label>
+          <div class="input-with-suffix">
+            <input type="number" class="form-input" placeholder="15000" id="input-asset" min="0">
+            <span class="input-suffix">만원</span>
+          </div>
+          <div class="form-error" id="error-asset"></div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon red">💳</div>
+          <div><div class="card-title">총 부채</div><div class="card-desc">대출 + 카드값 합계</div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">부채 *</label>
+          <div class="input-with-suffix">
+            <input type="number" class="form-input" placeholder="8000" id="input-debt" min="0">
+            <span class="input-suffix">만원</span>
+          </div>
+          <div class="form-error" id="error-debt"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bottom-fixed">
+      <button class="btn btn-primary" onclick="calculateResult()" id="btn-calculate">진단하기</button>
+    </div>
+  </div>
+
+  <!-- ========== 3. 결과 화면 ========== -->
+  <div class="screen result-screen" id="s-result">
+    <div class="result-hero">
+      <div class="result-confetti">🎉</div>
+      <div class="result-badge"><span>✨</span> 진단 완료</div>
+      <h2 class="result-title" id="result-title">닉네임님의 금융집짓기®</h2>
+      <p class="result-name" id="result-summary">35세 · 순자산 7,000만원</p>
+    </div>
+    
+    <div class="house-display">
+      <div class="house-image-container">
+        <img class="house-image" id="result-house-img" src="https://moneya-frontend.vercel.app/assets/house3-CiiNxUBf.jpg" alt="금융집짓기">
+        <div class="house-level-badge" id="result-level-badge">3단계</div>
+      </div>
+      <div class="house-info">
+        <div class="house-name" id="result-house-name">한옥</div>
+        <div class="house-score" id="result-house-score"><span>⭐</span> 부자지수 65점</div>
+        <div class="house-desc" id="result-house-desc">안정적인 재무 기반을 갖추셨습니다!</div>
+      </div>
+      <div class="share-section">
+        <button class="share-btn kakao" onclick="shareKakao()"><span>💬</span> 카톡 공유</button>
+        <button class="share-btn copy" onclick="copyLink()"><span>🔗</span> 링크 복사</button>
+      </div>
+    </div>
+    
+    <div class="cta-section">
+      <div class="cta-header">
+        <div class="cta-icon">📊</div>
+        <h3>상세 분석 리포트 받기</h3>
+        <p>100만원 상당의 재무분석 리포트를<br/>무료로 받아보세요!</p>
+      </div>
+      <div class="cta-benefits">
+        <div class="cta-benefit"><span class="check">✓</span><span>부채비율 분석 및 개선 가이드</span></div>
+        <div class="cta-benefit"><span class="check">✓</span><span>비상예비자금 권장 금액 안내</span></div>
+        <div class="cta-benefit"><span class="check">✓</span><span>가족수별 맞춤 예산 설계</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('s-cta')">무료 리포트 받기 <span>📩</span></button>
+    </div>
+    
+    <div class="copyright" style="color:rgba(255,255,255,0.7)">© 2017 오원트금융연구소. All rights reserved</div>
+  </div>
+
+  <!-- ========== 4. CTA 입력 폼 ========== -->
+  <div class="screen cta-form-screen" id="s-cta">
+    <div class="header">
+      <button class="header-back" onclick="goTo('s-result')">←</button>
+      <div class="header-title">리포트 받기</div>
+    </div>
+    
+    <div class="content">
+      <div class="cta-form-card">
+        <div class="cta-form-header">
+          <div class="cta-form-icon">📩</div>
+          <h3>상세 리포트 발송</h3>
+          <p>입력하신 연락처로<br/>즉시 발송됩니다</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">닉네임</label>
+          <input type="text" class="form-input" id="cta-nickname" readonly style="background:var(--bg-secondary);">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">전화번호 *</label>
+          <input type="tel" class="form-input" placeholder="010-0000-0000" id="cta-phone">
+          <div class="form-error" id="error-phone"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">이메일 *</label>
+          <input type="email" class="form-input" placeholder="example@email.com" id="cta-email">
+          <div class="form-error" id="error-email"></div>
+        </div>
+        
+        <div class="form-divider"></div>
+        
+        <div class="form-group">
+          <label class="form-label">가족 수 *</label>
+          <div class="select-group">
+            <button class="select-btn" onclick="selectFamily(this,1)" data-value="1">1인</button>
+            <button class="select-btn" onclick="selectFamily(this,2)" data-value="2">2인</button>
+            <button class="select-btn" onclick="selectFamily(this,3)" data-value="3">3인</button>
+            <button class="select-btn" onclick="selectFamily(this,4)" data-value="4">4인</button>
+            <button class="select-btn" onclick="selectFamily(this,5)" data-value="5">5인+</button>
+          </div>
+          <div class="form-error" id="error-family"></div>
+        </div>
+        
+        <div class="privacy-notice">
+          <span class="icon">🔒</span>
+          <p>입력하신 정보는 리포트 발송 용도로만 사용되며, 제3자에게 절대 제공되지 않습니다.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bottom-fixed">
+      <button class="btn btn-primary" onclick="submitCTA()" id="btn-submit">리포트 받기 <span>→</span></button>
+    </div>
+  </div>
+
+  <!-- ========== 5. 완료 화면 ========== -->
+  <div class="screen complete-screen" id="s-complete">
+    <div class="complete-icon">✅</div>
+    <h2 class="complete-title">발송 완료!</h2>
+    <p class="complete-desc">재무분석 리포트가<br/>카카오톡으로 발송되었습니다</p>
+    <div class="complete-info">
+      <p>📱 카카오톡을 확인해주세요<br/>몇 분 내로 리포트 링크가 도착합니다</p>
+    </div>
+    <button class="btn" style="background:white;color:var(--success);max-width:280px" onclick="window.location.href='https://moneya.app'">AI머니야 앱 시작하기 →</button>
+    <div class="copyright" style="color:rgba(255,255,255,0.7);margin-top:40px">© 2017 오원트금융연구소. All rights reserved</div>
+  </div>
+</div>
+
+<script>
+// ========== 데이터 ==========
+const houseData = [
+  { level: 1, name: '텐트', minScore: 0, maxScore: 0, image: 'https://moneya-frontend.vercel.app/assets/house1-Cg76rqP7.jpg', desc: '재무 여정의 시작점입니다. 지금부터 차근차근 금융집짓기®를 시작해요! 작은 저축부터 시작하면 언젠가 궁전을 지을 수 있습니다. 💪' },
+  { level: 2, name: '초가집', minScore: 1, maxScore: 50, image: 'https://moneya-frontend.vercel.app/assets/house2-B1GiF-3L.jpg', desc: '기초를 다지는 단계입니다. 부채를 줄이고 비상예비자금을 마련하는 것이 우선입니다. 꾸준한 저축 습관이 중요해요! 🌱' },
+  { level: 3, name: '한옥', minScore: 51, maxScore: 100, image: 'https://moneya-frontend.vercel.app/assets/house3-CiiNxUBf.jpg', desc: '안정적인 재무 기반을 갖추셨습니다! 저축률을 조금 더 높이고 투자를 시작하면 양옥으로 업그레이드할 수 있어요. 🏠' },
+  { level: 4, name: '양옥', minScore: 101, maxScore: 200, image: 'https://moneya-frontend.vercel.app/assets/house4-ywz7gWNQ.jpg', desc: '훌륭한 재무 상태입니다! 체계적인 투자와 절세 전략으로 궁전을 향해 나아가세요. 파이어족도 꿈이 아닙니다! 🌟' },
+  { level: 5, name: '궁전', minScore: 201, maxScore: 99999, image: 'https://moneya-frontend.vercel.app/assets/house5-CLgrT-Xl.jpg', desc: '진정한 부자입니다! 토마스 스탠리 교수 기준 상위 부자에 해당합니다. 이 수준을 유지하면서 다음 세대를 위한 자산 이전도 고려해보세요. 🏰' }
+];
+
+let userData = {};
+let selectedFamily = null;
+
+// ========== 화면 전환 ==========
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ========== 유효성 검사 ==========
+function validateInput() {
+  let isValid = true;
+  
+  const nickname = document.getElementById('input-nickname').value.trim();
+  const age = document.getElementById('input-age').value;
+  const income = document.getElementById('input-income').value;
+  const asset = document.getElementById('input-asset').value;
+  const debt = document.getElementById('input-debt').value;
+  
+  // 닉네임
+  if (!nickname) {
+    document.getElementById('error-nickname').textContent = '닉네임을 입력해주세요';
+    document.getElementById('input-nickname').classList.add('error');
+    isValid = false;
+  } else {
+    document.getElementById('error-nickname').textContent = '';
+    document.getElementById('input-nickname').classList.remove('error');
+  }
+  
+  // 나이
+  if (!age || age < 19 || age > 100) {
+    document.getElementById('error-age').textContent = '19세 이상 100세 이하로 입력해주세요';
+    document.getElementById('input-age').classList.add('error');
+    isValid = false;
+  } else {
+    document.getElementById('error-age').textContent = '';
+    document.getElementById('input-age').classList.remove('error');
+  }
+  
+  // 월급
+  if (!income || income < 0) {
+    document.getElementById('error-income').textContent = '월급을 입력해주세요';
+    document.getElementById('input-income').classList.add('error');
+    isValid = false;
+  } else {
+    document.getElementById('error-income').textContent = '';
+    document.getElementById('input-income').classList.remove('error');
+  }
+  
+  // 자산
+  if (asset === '' || asset < 0) {
+    document.getElementById('error-asset').textContent = '자산을 입력해주세요';
+    document.getElementById('input-asset').classList.add('error');
+    isValid = false;
+  } else {
+    document.getElementById('error-asset').textContent = '';
+    document.getElementById('input-asset').classList.remove('error');
+  }
+  
+  // 부채
+  if (debt === '' || debt < 0) {
+    document.getElementById('error-debt').textContent = '부채를 입력해주세요';
+    document.getElementById('input-debt').classList.add('error');
+    isValid = false;
+  } else {
+    document.getElementById('error-debt').textContent = '';
+    document.getElementById('input-debt').classList.remove('error');
+  }
+  
+  return isValid;
+}
+
+// ========== 결과 계산 ==========
+function calculateResult() {
+  if (!validateInput()) return;
+  
+  showLoading('부자지수 계산 중...');
+  
+  setTimeout(() => {
+    const nickname = document.getElementById('input-nickname').value.trim();
+    const age = parseInt(document.getElementById('input-age').value);
+    const income = parseInt(document.getElementById('input-income').value);
+    const asset = parseInt(document.getElementById('input-asset').value);
+    const debt = parseInt(document.getElementById('input-debt').value);
+    
+    const netAsset = asset - debt;
+    const wealthIndex = income > 0 ? Math.round((netAsset * 10) / (age * income * 12) * 100) : 0;
+    const debtRatio = asset > 0 ? Math.round((debt / asset) * 1000) / 10 : 0;
+    
+    // 금융집짓기® 결정
+    let house = houseData[0];
+    for (let h of houseData) {
+      if (wealthIndex >= h.minScore && wealthIndex <= h.maxScore) {
+        house = h;
+        break;
+      }
+    }
+    
+    // 세그먼트 결정
+    let segment = 'stable';
+    if (debtRatio > 40) segment = 'debt_risk';
+    else if (wealthIndex < 50) segment = 'beginner';
+    else if (wealthIndex > 100) segment = 'excellent';
+    
+    // 데이터 저장
+    userData = {
+      nickname, age, income, asset, debt, netAsset, 
+      wealthIndex, debtRatio, house, segment,
+      createdAt: new Date().toISOString()
+    };
+    
+    // 결과 화면 업데이트
+    document.getElementById('result-title').textContent = `${nickname}님의 금융집짓기®`;
+    document.getElementById('result-summary').textContent = `${age}세 · 순자산 ${formatNumber(netAsset)}만원`;
+    document.getElementById('result-house-img').src = house.image;
+    document.getElementById('result-level-badge').textContent = `${house.level}단계`;
+    document.getElementById('result-house-name').textContent = house.name;
+    document.getElementById('result-house-score').innerHTML = `<span>⭐</span> 부자지수 ${wealthIndex}점`;
+    document.getElementById('result-house-desc').textContent = house.desc;
+    
+    // CTA 폼에 닉네임 전달
+    document.getElementById('cta-nickname').value = nickname;
+    
+    hideLoading();
+    goTo('s-result');
+  }, 1500);
+}
+
+// ========== 가족수 선택 ==========
+function selectFamily(btn, num) {
+  document.querySelectorAll('.select-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedFamily = num;
+  document.getElementById('error-family').textContent = '';
+}
+
+// ========== CTA 제출 ==========
+function submitCTA() {
+  let isValid = true;
+  
+  const phone = document.getElementById('cta-phone').value.trim();
+  const email = document.getElementById('cta-email').value.trim();
+  
+  // 전화번호 검증
+  const phoneRegex = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
+  if (!phone || !phoneRegex.test(phone.replace(/-/g, ''))) {
+    document.getElementById('error-phone').textContent = '올바른 전화번호를 입력해주세요';
+    isValid = false;
+  } else {
+    document.getElementById('error-phone').textContent = '';
+  }
+  
+  // 이메일 검증
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    document.getElementById('error-email').textContent = '올바른 이메일을 입력해주세요';
+    isValid = false;
+  } else {
+    document.getElementById('error-email').textContent = '';
+  }
+  
+  // 가족수 검증
+  if (!selectedFamily) {
+    document.getElementById('error-family').textContent = '가족수를 선택해주세요';
+    isValid = false;
+  }
+  
+  if (!isValid) return;
+  
+  showLoading('리포트 발송 중...');
+  
+  // 사용자 데이터 완성
+  userData.phone = phone;
+  userData.email = email;
+  userData.familySize = selectedFamily;
+  
+  // Google Sheets API로 데이터 전송
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzngzqwukIs-TGUAjEHzj_rQwkjO-0Om-ptAPuwWtmAmrsnkd4b4WAPm5aqnLGuJaX_/exec';
+  
+  const submitData = {
+    nickname: userData.nickname || '고객',
+    phone: phone,
+    email: email
+  };
+  
+  console.log('Sending to Google Sheets:', submitData);
+  
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(submitData)
+  })
+  .then(() => {
+    console.log('Data sent successfully');
+    hideLoading();
+    goTo('s-complete');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    hideLoading();
+    goTo('s-complete'); // 에러가 나도 완료 화면으로 이동
+  });
+}
+
+// ========== 유틸리티 ==========
+function formatNumber(num) {
+  if (num >= 10000) return (num / 10000).toFixed(1) + '억';
+  if (num < 0) return '-' + formatNumber(Math.abs(num));
+  return num.toLocaleString();
+}
+
+function showLoading(text) {
+  document.getElementById('loading').classList.add('active');
+  document.querySelector('.loading-text').textContent = text || '처리 중...';
+}
+
+function hideLoading() {
+  document.getElementById('loading').classList.remove('active');
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function copyLink() {
+  const url = window.location.href.split('?')[0];
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('링크가 복사되었습니다!');
+  });
+}
+
+function shareKakao() {
+  // 카카오 SDK 초기화 필요
+  // Kakao.Link.sendDefault({...});
+  showToast('카카오톡 공유 기능은 앱에서 사용 가능합니다');
+}
+
+// ========== 초기화 ==========
+document.addEventListener('DOMContentLoaded', function() {
+  // 진단 완료 수 애니메이션
+  const statCount = document.getElementById('stat-count');
+  let count = 32000;
+  const interval = setInterval(() => {
+    count += Math.floor(Math.random() * 5) + 1;
+    statCount.textContent = count.toLocaleString();
+  }, 3000);
+  
+  // URL 파라미터에서 추천 코드 확인
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+  if (refCode) {
+    userData.referralCode = refCode;
+    console.log('Referral code:', refCode);
+  }
+  
+  // 유입 경로 추적
+  const source = urlParams.get('utm_source') || document.referrer || 'direct';
+  userData.source = source;
+});
+</script>
+
+</body>
+</html>
