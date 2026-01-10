@@ -444,9 +444,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-secondary);min-he
   <div class="screen complete-screen" id="s-complete">
     <div class="complete-icon">✅</div>
     <h2 class="complete-title">발송 완료!</h2>
-    <p class="complete-desc">재무분석 리포트가<br/>카카오톡으로 발송되었습니다</p>
+    <p class="complete-desc">재무분석 리포트가<br/>이메일로 발송되었습니다</p>
     <div class="complete-info">
-      <p>📱 카카오톡을 확인해주세요<br/>몇 분 내로 리포트 링크가 도착합니다</p>
+      <p>📧 이메일을 확인해주세요<br/>몇 분 내로 리포트가 도착합니다</p>
     </div>
     <button class="btn" style="background:white;color:var(--success);max-width:280px" onclick="window.location.href='https://moneya.app'">AI머니야 앱 시작하기 →</button>
     <div class="copyright" style="color:rgba(255,255,255,0.7);margin-top:40px">© 2017 오원트금융연구소. All rights reserved</div>
@@ -568,10 +568,11 @@ function calculateResult() {
     else if (wealthIndex < 50) segment = 'beginner';
     else if (wealthIndex > 100) segment = 'excellent';
     
-    // 데이터 저장
+    // 데이터 저장 (재무 데이터 포함)
     userData = {
       nickname, age, income, asset, debt, netAsset, 
       wealthIndex, debtRatio, house, segment,
+      houseType: house.name,
       createdAt: new Date().toISOString()
     };
     
@@ -640,13 +641,21 @@ function submitCTA() {
   userData.email = email;
   userData.familySize = selectedFamily;
   
-  // Google Sheets API로 데이터 전송
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzngzqwukIs-TGUAjEHzj_rQwkjO-0Om-ptAPuwWtmAmrsnkd4b4WAPm5aqnLGuJaX_/exec';
+  // ★★★ 새 Google Apps Script URL ★★★
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfS29e7ypF1h0nsxKUPcHBRKqidNdC6kGM7yNaOIuDLvhJ3zz_I_t5m7c0DiUPqVSv/exec';
   
+  // ★★★ 재무 데이터 포함하여 전송 ★★★
   const submitData = {
     nickname: userData.nickname || '고객',
     phone: phone,
-    email: email
+    email: email,
+    age: userData.age || '',
+    income: userData.income || '',
+    assets: userData.asset || '',
+    debt: userData.debt || '',
+    wealth_index: userData.wealthIndex || '',
+    house_type: userData.houseType || '',
+    family_count: selectedFamily || ''
   };
   
   console.log('Sending to Google Sheets:', submitData);
