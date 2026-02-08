@@ -838,7 +838,6 @@ function shareKakao() {
       buttons: [{ title: '결과 보기', link: { mobileWebUrl: url, webUrl: url } }]
     });
   } else {
-    // 카카오 SDK 없으면 기본 공유
     window.open('https://sharer.kakao.com/talk/friends/picker/link?url=' + encodeURIComponent(url));
   }
 }
@@ -1097,7 +1096,7 @@ function renderReport() {
         <div class="cta-icon">🚀</div>
         <h3 class="cta-title">더 자세한 분석이 필요하세요?</h3>
         <p class="cta-desc">AI머니야에서 매일 지출을 음성으로 관리하고,<br>궁전을 향한 여정을 시작하세요!</p>
-        <a href="https://moneya.app" class="cta-btn">
+        <a href="https://moneya-frontend.vercel.app" class="cta-btn">
           <span>💬</span>
           <span>AI머니야 앱 시작하기</span>
         </a>
